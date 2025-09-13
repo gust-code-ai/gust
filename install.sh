@@ -50,7 +50,6 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
-[[ -z "${REPO}" ]] && { usage; err "--repo is required (e.g. --repo acme/mytool)"; }
 
 # --------------------------
 # Detect platform
