@@ -190,6 +190,7 @@ mkdir -p "$WORKDIR"
 
 # Determine type and extract
 FILETYPE="$(file -b "$ASSET_FILE" || true)"
+echo $ASSET_FILE
 BIN_PATH=""
 case "$ASSET_FILE" in
   *.tar.gz|*.tgz)
