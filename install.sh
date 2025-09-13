@@ -153,7 +153,7 @@ SUMS_URL="$(printf "%s" "$RELEASE_JSON" \
 # Download to temp and unpack
 # --------------------------
 TMPDIR="$(mktemp -d)"
-trap 'rm -rf "$TMPDIR"' EXIT
+#trap 'rm -rf "$TMPDIR"' EXIT
 
 ASSET_BASENAME="$(basename "$ASSET_URL")"
 ASSET_FILE="${TMPDIR}/${ASSET_BASENAME}"
@@ -191,8 +191,6 @@ mkdir -p "$WORKDIR"
 
 # Determine type and extract
 FILETYPE="$(file -b "$ASSET_FILE" || true)"
-echo $ASSET_FILE
-echo $ASSET_BASENAME
 BIN_PATH=""
 case "$ASSET_BASENAME" in
   *.tar.gz|*.tgz)
@@ -219,7 +217,8 @@ if [[ -z "${BIN_PATH}" ]]; then
     BIN_PATH="$WORKDIR/${BINARY_NAME}.exe"
   else
     # Otherwise pick the first executable file
-    BIN_PATH="$(find "$WORKDIR" -type f -perm -u+x -maxdepth 2 | head -n1 || true)"
+    BIN_PATH="$(find "$WORKDIR" -maxdepth 2 -type f -perm -u+x ! -name '._*' | head -n1 || true)"
+    echo $BIN_PATH
   fi
 fi
 
