@@ -155,7 +155,8 @@ SUMS_URL="$(printf "%s" "$RELEASE_JSON" \
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
 
-ASSET_FILE="${TMPDIR}/asset"
+ASSET_BASENAME="$(basename "$ASSET_URL")"
+ASSET_FILE="${TMPDIR}/${ASSET_BASENAME}"
 info "Downloading asset..."
 curl -fsSL "${AUTH_HEADER[@]}" -o "$ASSET_FILE" "$ASSET_URL"
 
