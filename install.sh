@@ -4,7 +4,7 @@ set -euo pipefail
 # --------------------------
 # Config (can be overridden by flags)
 # --------------------------
-REPO=""
+REPO="gust-code-ai/gust"
 BINARY_NAME="gust"
 INSTALL_DIR="${HOME}/.local/bin"
 VERSION="" # e.g. v1.2.3; if empty, uses latest
