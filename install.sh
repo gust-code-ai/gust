@@ -93,14 +93,23 @@ else
 fi
 
 # Note: GITHUB_TOKEN respected if set (for higher rate limits)
-AUTH_HEADER=()
+#AUTH_HEADER=()
+#if [[ -n "${GITHUB_TOKEN:-}" ]]; then
+#  AUTH_HEADER=( -H "Authorization: Bearer ${GITHUB_TOKEN}" )
+#fi
+
+CURL_OPTS=(-fsSL -H "Accept: application/vnd.github+json")
 if [[ -n "${GITHUB_TOKEN:-}" ]]; then
-  AUTH_HEADER=( -H "Authorization: Bearer ${GITHUB_TOKEN}" )
+  CURL_OPTS+=(-H "Authorization: Bearer ${GITHUB_TOKEN}")
 fi
 
+
 info "Fetching release metadata from ${RELEASE_URL}"
-RELEASE_JSON="$(curl -fsSL "${AUTH_HEADER[@]}" -H "Accept: application/vnd.github+json" "$RELEASE_URL")" \
+RELEASE_JSON="$(curl "${CURL_OPTS[@]}" "$RELEASE_URL")" \
   || err "Failed to fetch release metadata"
+
+#RELEASE_JSON="$(curl -fsSL "${AUTH_HEADER[@]}" -H "Accept: application/vnd.github+json" "$RELEASE_URL")" \
+  #|| err "Failed to fetch release metadata"
 
 # Extract tag name (for messaging)
 TAG_NAME="$(printf "%s" "$RELEASE_JSON" | sed -n 's/.*"tag_name":[[:space:]]*"\([^"]*\)".*/\1/p' | head -n1)"
@@ -132,7 +141,7 @@ choose_asset() {
       | sed -n "s/.*\"browser_download_url\":[[:space:]]*\"\([^\"]*${p}\).*/\1/p" \
       | head -n1)"
     if [[ -n "$ASSET_URL" ]]; then
-      echo "$ASSET_URL"
+        echo $ASSET_URL
       return 0
     fi
   done
@@ -158,13 +167,16 @@ TMPDIR="$(mktemp -d)"
 ASSET_BASENAME="$(basename "$ASSET_URL")"
 ASSET_FILE="${TMPDIR}/${ASSET_BASENAME}"
 info "Downloading asset..."
-curl -fsSL "${AUTH_HEADER[@]}" -o "$ASSET_FILE" "$ASSET_URL"
+#curl -fsSL "${AUTH_HEADER[@]}" -o "$ASSET_FILE" "$ASSET_URL"
+curl "${CURL_OPTS[@]}" -o "$ASSET_FILE" "$ASSET_URL"
+
 
 # Verify SHA256 if sums file exists
 if [[ -n "$SUMS_URL" ]]; then
   info "Verifying SHA256 checksum..."
   SUMS_FILE="${TMPDIR}/SHA256SUMS"
-  curl -fsSL "${AUTH_HEADER[@]}" -o "$SUMS_FILE" "$SUMS_URL"
+  #curl -fsSL "${AUTH_HEADER[@]}" -o "$SUMS_FILE" "$SUMS_URL"
+  curl "${CURL_OPTS[@]}" -o "$SUMS_FILE" "$SUMS_URL"
   # Try to extract just our asset's filename from the URL for matching
   ASSET_BASENAME="$(basename "$ASSET_URL")"
   if grep -q "$ASSET_BASENAME" "$SUMS_FILE"; then
@@ -218,7 +230,6 @@ if [[ -z "${BIN_PATH}" ]]; then
   else
     # Otherwise pick the first executable file
     BIN_PATH="$(find "$WORKDIR" -maxdepth 2 -type f -perm -u+x ! -name '._*' | head -n1 || true)"
-    echo $BIN_PATH
   fi
 fi
 
