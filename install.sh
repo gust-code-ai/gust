@@ -192,8 +192,9 @@ mkdir -p "$WORKDIR"
 # Determine type and extract
 FILETYPE="$(file -b "$ASSET_FILE" || true)"
 echo $ASSET_FILE
+echo $ASSET_BASENAME
 BIN_PATH=""
-case "$ASSET_FILE" in
+case "$ASSET_BASENAME" in
   *.tar.gz|*.tgz)
     info "Extracting tar.gz..."
     tar -xzf "$ASSET_FILE" -C "$WORKDIR"
